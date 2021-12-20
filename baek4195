@@ -1,0 +1,97 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        int caseNum = scan.nextInt();
+        for (int i = 0; i < caseNum; i++) {
+            int relationNum = scan.nextInt();
+            Network network = new Network();
+            for (int j = 0; j < relationNum; j++) {
+                String name1 = scan.next();
+                String name2 = scan.next();
+                if(network.isNewRelation(name1, name2)){
+                    network.addNewNet(name1, name2);
+                }else if(network.isSubRelation(name1) && network.isSubRelation(name2)){
+                    network.union(name1, name2);
+                }else{
+                    String parent = network.whoIsParent(name1, name2);
+                    String child = network.whoIsChild(name1, name2);
+                    network.addSubNet(parent, child);
+                }
+                network.printAllNet(name1, name2);
+            }
+
+        }
+    }
+
+    static class Network{
+        int head = 0;
+        HashMap<Integer, ArrayList<String>> netInfoList;
+        HashMap<String, Integer> net;
+
+        Network(){
+            this.net = new HashMap<String, Integer>();
+            this.netInfoList = new HashMap<Integer, ArrayList<String>>();
+        }
+
+        public boolean isNewRelation(String name1, String name2){
+            return !this.net.containsKey(name1)&&!this.net.containsKey(name2);
+        }
+        public String whoIsParent(String name1, String name2){
+            if(this.isSubRelation(name1))
+                return name1;
+            return name2;
+        }
+        public String whoIsChild(String name1, String name2){
+            if(!this.isSubRelation(name1))
+                return name1;
+            return name2;
+        }
+        public boolean isSubRelation(String name1){
+            return this.net.containsKey(name1);
+        }
+        public void addNewNet(String name1, String name2){
+            this.head++;
+            this.net.put(name1, this.head);
+            this.net.put(name2, this.head);
+            ArrayList<String> netInfo = new ArrayList<String>();
+            netInfo.add(name1);
+            netInfo.add(name2);
+            this.netInfoList.put(this.head, netInfo);
+        }
+        public void union(String name1, String name2){
+            int parent = Math.min(this.net.get(name1), this.net.get(name2));
+            int child = Math.max(this.net.get(name1), this.net.get(name2));
+            if(child == parent) return;
+            ArrayList<String> parent_netInfo = this.netInfoList.get(parent);
+            ArrayList<String> child_netInfo = this.netInfoList.get(child);
+            parent_netInfo.addAll(child_netInfo);
+            for (String name : parent_netInfo) {
+                this.net.put(name, parent);
+            }
+            this.netInfoList.put(parent, parent_netInfo);
+            this.netInfoList.remove(child);
+        }
+        public void addSubNet(String parent, String child){
+            int parent_netNum = this.net.get(parent);
+            this.net.put(child, parent_netNum);
+            ArrayList<String> parent_netInfo = this.netInfoList.get(parent_netNum);
+            parent_netInfo.add(child);
+            this.netInfoList.put(parent_netNum, parent_netInfo);
+        }
+        public void printAllNet(String name1, String name2){
+            int name1_netNum = net.get(name1);
+            int name2_netNum = net.get(name2);
+            if(netInfoList.get(name1_netNum).size() == 0 || netInfoList.get(name2_netNum).size() == 0) return;
+            if(name1_netNum == name2_netNum){
+                System.out.println(netInfoList.get(name1_netNum).size());
+            }
+            else{
+                System.out.println(netInfoList.get(name1_netNum).size()+netInfoList.get(name2_netNum).size());
+            }
+        }
+    }
+}
