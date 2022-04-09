@@ -1,0 +1,27 @@
+import java.util.*;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String original = scan.nextLine();
+		String key = scan.nextLine();
+		String encode = "";
+		int key_counter = 0;
+		for(int idx = 0; idx < original.length(); idx++) {
+			char chr = original.charAt(idx);
+			if(chr != ' ') {
+				char key_chr = key.charAt(key_counter);
+				if(chr - key_chr < 1) {
+					chr += 'z';
+					chr -= key_chr;
+				}else {
+					chr -= key_chr - 96;
+				}
+			}
+			encode+=chr;
+			key_counter = (key_counter == key.length()-1) ? 0 : key_counter+1;
+		}
+		
+		System.out.println(encode);
+	}
+}

@@ -1,0 +1,54 @@
+import java.util.*;
+
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		int time = scan.nextInt();
+		int win_rate = scan.nextInt();
+		int increase_rate = scan.nextInt();
+		double[] wins = getMaxTime(win_rate, increase_rate);
+		double[] loses = new double[wins.length];
+		
+		for(int idx = 0; idx < wins.length; idx++) {
+			loses[idx] = 100 - wins[idx];
+		}
+		
+		double result = 0;
+		
+		for(int i=0; i < wins.length; i++) {
+			double temp_rate = wins[i]/100;
+			for(int j = 0; j < i; j++) {
+				temp_rate *= loses[j]/100;
+			}
+			temp_rate *= (double)(i+1)*time;
+			result += temp_rate;
+		}
+		String str = "" + result;
+		String[] strList = str.split("[.]");
+		if(strList[1].length() < 7) {
+			while(strList[1].length() < 7) {
+				strList[1]+="0";
+			}
+		}
+		str = strList[0]+"."+strList[1].substring(0, 7);
+		System.out.println(str);
+	}
+	
+	static double[] getMaxTime(int win, int inc) {
+		ArrayList<Double> tempList = new ArrayList<Double>();
+		double wins = (double)win;
+		double factor = (double)(inc+100)/100;
+		while(wins<100) {
+			tempList.add(wins);
+			wins *= factor;
+		}
+		double hundred = 100;
+		tempList.add(hundred);
+		double[] resultList = new double[tempList.size()];
+		for(int idx = 0; idx < tempList.size(); idx++) {
+			resultList[idx] = tempList.get(idx);
+		}
+		return resultList;
+	}
+}
